@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  localstack:
+    container_name: localstack
+    image: localstack/localstack:3.0.2
+    ports:
+      - "4566:4566"
+    environment:
+      - DEBUG=${DEBUG-}
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./ui:/ui
+  
+  terraform:
+    depends_on:
+      - localstack
+    container_name: terraform
+    image: hashicorp/terraform:1.5.1
+    volumes:
+      - ./infrastructure:/infrastructure
+    working_dir: /infrastructure
